@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sua Previdenciarista - Dra Daniele Graças</title>
+
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Ícones -->
+    <link rel="icon" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-512.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Sua Previdenciarista</h1>
+        <p style="margin-top:5px; opacity:0.7;">Por Dra. Daniele Graças</p>
+    </header>
+
+    <main class="container">
+
+        <!-- TELA INICIAL -->
+        <section id="home" class="screen">
+            <button class="button" id="btnNovoAtendimento">Novo Atendimento</button>
+            <button class="button ghost" id="btnAcompanhar">Acompanhar Processo</button>
+        </section>
+
+        <!-- NOVO ATENDIMENTO -->
+        <section id="atendimento" class="screen hidden">
+            <div class="card">
+                <h2>Novo Atendimento</h2>
+
+                <label>Nome completo</label>
+                <input id="nome" type="text" />
+
+                <label>Idade</label>
+                <input id="idade" type="number" />
+
+                <label>Sexo</label>
+                <select id="sexo">
+                    <option value="">Selecione</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                </select>
+
+                <div id="gravidezBox" class="hidden">
+                    <label>Está grávida atualmente?</label>
+                    <select id="gravidez">
+                        <option value="">Selecione</option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                    </select>
+                </div>
+
+                <label>Recebe Bolsa Família?</label>
+                <select id="bolsa">
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                </select>
+
+                <label>Tem alguma doença ou limitação?</label>
+                <input id="doenca" type="text" />
+
+                <label>Possui laudo médico?</label>
+                <select id="laudo">
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                </select>
+
+                <button class="button" id="btnEnviarAtendimento">Enviar</button>
+                <button class="button ghost" id="btnVoltar1">Voltar</button>
+            </div>
+        </section>
+
+        <!-- RESULTADO DO ATENDIMENTO -->
+        <section id="resultado" class="screen hidden">
+            <div class="card">
+                <h2>Resultado do Atendimento</h2>
+                <p id="resultadoTexto"></p>
+
+                <h3>Entre em contato:</h3>
+                <p><b>WhatsApp:</b> 9899147-9384</p>
+                <p><b>Instagram:</b> @suaprevidenciarista</p>
+                <p><b>Endereço:</b> Rua Pedro Mata, 67 — em frente ao INSS, Chapadinha-MA</p>
+
+                <button class="button" id="btnVoltarResultados">Voltar ao início</button>
+            </div>
+        </section>
+
+        <!-- ACOMPANHAR PROCESSO -->
+        <section id="processo" class="screen hidden">
+            <div class="card">
+                <h2>Acompanhar Processo</h2>
+
+                <label>Número do processo</label>
+                <input id="procBuscar" type="text" />
+
+                <button class="button" id="btnBuscarMov">Buscar</button>
+
+                <h3>Última movimentação:</h3>
+                <p id="movText"></p>
+
+                <button class="button ghost" id="btnVoltar2">Voltar</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Rua Pedro Mata, 67 — Em frente ao INSS — Chapadinha-MA</p>
+        <p>WhatsApp: 98 99147-9384 • Instagram: @suaprevidenciarista</p>
+    </footer>
+
+    <!-- Script principal -->
+    <script src="app.js"></script>
+
+    <!-- REGISTRO DO SERVICE WORKER -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js")
+                .catch(err => console.log("Erro SW:", err));
+        }
+    </script>
+
+</body>
+</html>
+
