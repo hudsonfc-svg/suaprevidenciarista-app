@@ -1,135 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Sua Previdenciarista - Dra Daniele Graças</title>
-
-    <!-- Manifest PWA -->
-    <link rel="manifest" href="manifest.json" />
-
-    <!-- Ícones -->
-    <link rel="icon" href="icon-192.png" />
-    <link rel="apple-touch-icon" href="icon-512.png" />
-
-    <!-- Estilos -->
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sua Previdenciarista</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; }
+    .hidden { display: none; }
+    button { margin:5px; padding:8px 12px; cursor:pointer; }
+    input, select { padding:5px; margin:5px 0; width: 200px; }
+    .card { border:1px solid #ccc; padding:10px; margin:5px 0; border-radius:5px; }
+    #aiResult { margin-top:20px; padding:10px; border:1px solid #666; border-radius:5px; background:#f9f9f9; }
+  </style>
 </head>
-
 <body>
-    <header>
-        <h1>Sua Previdenciarista</h1>
-        <p style="margin-top:5px; opacity:0.7;">Por Dra. Daniele Graças</p>
-    </header>
 
-    <main class="container">
+  <!-- TELA HOME -->
+  <div id="home">
+    <h1>Sua Previdenciarista</h1>
+    <button id="btnTrack">Acompanhar Processo</button>
+    <button id="btnNew">Novo Cliente</button>
+    <button id="btnAdminLogin">Login Admin</button>
+  </div>
 
-        <!-- TELA INICIAL -->
-        <section id="home" class="screen">
-            <button class="button" id="btnNovoAtendimento">Novo Atendimento</button>
-            <button class="button ghost" id="btnAcompanhar">Acompanhar Processo</button>
-        </section>
+  <!-- TELA TRACK -->
+  <div id="track" class="hidden">
+    <h2>Acompanhar Processo</h2>
+    <input type="text" id="trackInput" placeholder="Número do processo ou CPF">
+    <button id="btnSearch">Buscar</button>
+    <div id="trackResult"></div>
+    <button id="btnBackFromTrack">Voltar</button>
+  </div>
 
-        <!-- NOVO ATENDIMENTO -->
-        <section id="atendimento" class="screen hidden">
-            <div class="card">
-                <h2>Novo Atendimento</h2>
-
-                <label>Nome completo</label>
-                <input id="nome" type="text" />
-
-                <label>Idade</label>
-                <input id="idade" type="number" />
-
-                <label>Sexo</label>
-                <select id="sexo">
-                    <option value="">Selecione</option>
-                    <option value="feminino">Feminino</option>
-                    <option value="masculino">Masculino</option>
-                </select>
-
-                <div id="gravidezBox" class="hidden">
-                    <label>Está grávida atualmente?</label>
-                    <select id="gravidez">
-                        <option value="">Selecione</option>
-                        <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
-                    </select>
-                </div>
-
-                <label>Recebe Bolsa Família?</label>
-                <select id="bolsa">
-                    <option value="">Selecione</option>
-                    <option value="sim">Sim</option>
-                    <option value="nao">Não</option>
-                </select>
-
-                <label>Tem alguma doença ou limitação?</label>
-                <input id="doenca" type="text" />
-
-                <label>Possui laudo médico?</label>
-                <select id="laudo">
-                    <option value="">Selecione</option>
-                    <option value="sim">Sim</option>
-                    <option value="nao">Não</option>
-                </select>
-
-                <button class="button" id="btnEnviarAtendimento">Enviar</button>
-                <button class="button ghost" id="btnVoltar1">Voltar</button>
-            </div>
-        </section>
-
-        <!-- RESULTADO DO ATENDIMENTO -->
-        <section id="resultado" class="screen hidden">
-            <div class="card">
-                <h2>Resultado do Atendimento</h2>
-                <p id="resultadoTexto"></p>
-
-                <h3>Entre em contato:</h3>
-                <p><b>WhatsApp:</b> 9899147-9384</p>
-                <p><b>Instagram:</b> @suaprevidenciarista</p>
-                <p><b>Endereço:</b> Rua Pedro Mata, 67 — em frente ao INSS, Chapadinha-MA</p>
-
-                <button class="button" id="btnVoltarResultados">Voltar ao início</button>
-            </div>
-        </section>
-
-        <!-- ACOMPANHAR PROCESSO -->
-        <section id="processo" class="screen hidden">
-            <div class="card">
-                <h2>Acompanhar Processo</h2>
-
-                <label>Número do processo</label>
-                <input id="procBuscar" type="text" />
-
-                <button class="button" id="btnBuscarMov">Buscar</button>
-
-                <h3>Última movimentação:</h3>
-                <p id="movText"></p>
-
-                <button class="button ghost" id="btnVoltar2">Voltar</button>
-            </div>
-        </section>
-
-    </main>
-
-    <footer>
-        <p>Rua Pedro Mata, 67 — Em frente ao INSS — Chapadinha-MA</p>
-        <p>WhatsApp: 98 99147-9384 • Instagram: @suaprevidenciarista</p>
-    </footer>
-
-    <!-- Script principal -->
-    <script src="app.js"></script>
-
-    <!-- REGISTRO DO SERVICE WORKER -->
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/sw.js")
-                .catch(err => console.log("Erro SW:", err));
-        }
-    </script>
-
-</body>
-</html>
-
+  <!-- TELA NEW -->
+  <div id="new" class="hidden">
+    <h2>Novo Cliente</h2>
+    <form id="formNew">
+      <input type="text" name="nome" placeholder="Nome" required><br>
+      <input type="number" name="idade" placeholder="Idade" required><br>
+      Sexo: 
+      <select name="sexo" id="sexo" required>
+        <option value="">Selecione</option>
+        <option value="M">Masculino</option>
+        <option value="F">Feminino</option>
+      </select><br>
+      <div id="gestacaoBlock" class="hidden">
+        Está grávida? <input type="text" name="gestante"><br>
+      </div>
+      Bolsa Família: <input type="text" name="bolsa"><br>
+      Renda: <input type="text" name="renda"><br>
+      Trabalho: <input type="text" name="trabalha"><br>
+      CTPS: 
+      <select name="ctps" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select><br>
+      <div id="anosCtpsBlock" class="hidden">
+        Anos de CTPS: <input type="number" name="anos_ctps"><br>
+      </div>
+      Doença: 
+      <select name="doenca" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select><br>
+      <div id="laudoBlock" class="hidden">
+        Laudo: <input type="text" name="laudo"><br>
+        Descrição: <input type="text" name="desc_doenca"><br>
+      </div>
+      Recebeu INSS: 
+      <select name="recebeu_inss" required>
+        <option value="">Selecione</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
+      </select><br>
+      <div id="recebeuBlock" class="hidden">
