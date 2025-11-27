@@ -1,20 +1,20 @@
-/* === CONFIGURE AQUI - substitua os placeholders === */
+/* === CONFIGURE AQUI === */
 const CONFIG = {
-  AIRTABLE_API_KEY: "PASTE_AIRTABLE_KEY_HERE",
-  AIRTABLE_BASE_ID: "PASTE_BASE_ID_HERE",
+  AIRTABLE_API_KEY: "COLOQUE_SUA_KEY_AQUI",
+  AIRTABLE_BASE_ID: "COLOQUE_SEU_BASE_ID_AQUI",
   AIRTABLE_TABLE_CLIENTES: "Clientes",
   AIRTABLE_TABLE_PROCESSOS: "Processos",
-  MAKE_WEBHOOK_URL: "PASTE_MAKE_WEBHOOK_HERE",
-  ADMIN_PASSWORD: "senhaadmin123" /* troque para algo seguro */
+  MAKE_WEBHOOK_URL: "COLOQUE_SUA_WEBHOOK_AQUI",
+  ADMIN_PASSWORD: "senhaadmin123"
 };
-/* ================================================== */
+/* ===================== */
 
 const headersAirtable = {
   "Authorization": "Bearer " + CONFIG.AIRTABLE_API_KEY,
   "Content-Type": "application/json"
 };
 
-function $(id){return document.getElementById(id)}
+function $(id){ return document.getElementById(id) }
 
 /* Screens */
 const screens = { home: $('home'), track: $('track'), new: $('new'), admin: $('admin') };
@@ -30,32 +30,31 @@ $('btnBackFromNew').addEventListener('click',()=>show('home'));
 $('btnBackFromTrack').addEventListener('click',()=>show('home'));
 $('btnBackFromAdmin').addEventListener('click',()=>show('home'));
 
-/* Condicionais do form */
+/* Form logic */
 $('sexo').addEventListener('change',e=>{
-  if(e.target.value==='F') document.getElementById('gestacaoBlock').classList.remove('hidden');
-  else document.getElementById('gestacaoBlock').classList.add('hidden');
+  if(e.target.value==='F') $('gestacaoBlock').classList.remove('hidden');
+  else $('gestacaoBlock').classList.add('hidden');
 });
 document.querySelector('[name="ctps"]').addEventListener('change',e=>{
-  if(e.target.value==='sim') document.getElementById('anosCtpsBlock').classList.remove('hidden');
-  else document.getElementById('anosCtpsBlock').classList.add('hidden');
+  if(e.target.value==='sim') $('anosCtpsBlock').classList.remove('hidden');
+  else $('anosCtpsBlock').classList.add('hidden');
 });
 document.querySelector('[name="doenca"]').addEventListener('change',e=>{
-  if(e.target.value==='sim') document.getElementById('laudoBlock').classList.remove('hidden');
-  else document.getElementById('laudoBlock').classList.add('hidden');
+  if(e.target.value==='sim') $('laudoBlock').classList.remove('hidden');
+  else $('laudoBlock').classList.add('hidden');
 });
 document.querySelector('[name="recebeu_inss"]').addEventListener('change',e=>{
-  if(e.target.value==='sim') document.getElementById('recebeuBlock').classList.remove('hidden');
-  else document.getElementById('recebeuBlock').classList.add('hidden');
+  if(e.target.value==='sim') $('recebeuBlock').classList.remove('hidden');
+  else $('recebeuBlock').classList.add('hidden');
 });
 
-/* Submit do formulário - cria registro no Airtable e chama Make para IA */
-$('formNew').addEventListener('submit', async (ev)=>{
+/* Submit do form */
+$('formNew').addEventListener('submit', async ev=>{
   ev.preventDefault();
   const fd = new FormData(ev.target);
   const payload = Object.fromEntries(fd.entries());
   payload.createdAt = new Date().toISOString();
 
-  // salvar no Airtable (tabela Clientes)
   const record = { fields: {
     Nome: payload.nome || '',
     Idade: payload.idade || '',
@@ -84,27 +83,22 @@ $('formNew').addEventListener('submit', async (ev)=>{
       body: JSON.stringify(record)
     });
     const data = await res.json();
-    // agora chamamos o Make webhook para receber a resposta da IA
-    const makeBody = {
-      cliente: payload,
-      airtableRecordId: data.id || null
-    };
+
+    const makeBody = { cliente: payload, airtableRecordId: data.id || null };
     const makeRes = await fetch(CONFIG.MAKE_WEBHOOK_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(makeBody)
     });
     const makeJson = await makeRes.json();
-    const aiText = makeJson.result || "No momento não foi possível gerar análise automática. Fale com a Dra. Daniele.";
+    const aiText = makeJson.result || "No momento não foi possível gerar análise automática.";
 
-    // mostrar resultado
     const aiDiv = $('aiResult');
     aiDiv.classList.remove('hidden');
     aiDiv.innerHTML = `<h3>Orientação (resumo automático)</h3><div>${aiText.replace(/\n/g,'<br>')}</div>
       <hr>
-      <div><strong>Contato:</strong> Rua Pedro Mata, 67 — Em frente ao INSS, Chapadinha-MA</div>
+      <div><strong>Contato:</strong> Rua Pedro Mata, 67 — Chapadinha-MA</div>
       <div><strong>WhatsApp:</strong> 98 99147-9384 • <strong>Instagram:</strong> @suaprevidenciarista</div>`;
-    // opcional: limpar form
     ev.target.reset();
   } catch(err){
     console.error(err);
@@ -112,7 +106,7 @@ $('formNew').addEventListener('submit', async (ev)=>{
   }
 });
 
-/* Acompanhar processo - busca na tabela Processos (por Numero ou CPF) */
+/* Track */
 $('btnSearch').addEventListener('click', async ()=>{
   const q = $('trackInput').value.trim();
   if(!q) return alert('Digite o número do processo ou CPF');
@@ -131,7 +125,7 @@ $('btnSearch').addEventListener('click', async ()=>{
         <strong>Decisão/Observação:</strong> ${r.Observacao || '-'}<br>
         <div style="margin-top:8px"><em>Se precisar de mais detalhes, fale com a Dra. Daniele:</em><br>98 99147-9384</div>`;
     } else {
-      out.innerHTML = `<em>Nenhum processo encontrado com esses dados. Procure a Dra. Daniele.</em>`;
+      out.innerHTML = `<em>Nenhum processo encontrado com esses dados.</em>`;
     }
   } catch(err){
     console.error(err);
@@ -139,12 +133,11 @@ $('btnSearch').addEventListener('click', async ()=>{
   }
 });
 
-/* Admin login */
-$('btnAdminLogin').addEventListener('click', async ()=>{
+/* Admin */
+$('btnAdminLogin').addEventListener('click', ()=>{
   const pass = $('adminPass').value;
   if(pass === CONFIG.ADMIN_PASSWORD){
     $('adminPanel').classList.remove('hidden');
-    // carregar atendimentos recentes
     loadAdminList();
   } else alert('Senha incorreta');
 });
@@ -169,31 +162,26 @@ async function loadAdminList(){
   }catch(err){console.error(err);alert('Erro ao carregar atendimentos');}
 }
 
-/* Salvar movimentação (admin) */
+/* Salvar movimentação admin */
 $('btnSaveMov').addEventListener('click', async ()=>{
   const processo = $('proc_num').value.trim();
   const dataMov = $('mov_date').value;
   const text = $('mov_text').value.trim();
   if(!processo || !dataMov || !text) return alert('Preencha todos os campos');
-  // Criar/atualizar registro na tabela Processos
   try {
-    // tenta encontrar processo
     const filter = `{Processo}="${processo}"`;
     const findRes = await fetch(`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${encodeURIComponent(CONFIG.AIRTABLE_TABLE_PROCESSOS)}?filterByFormula=${encodeURIComponent(filter)}`, { headers: headersAirtable});
     const fj = await findRes.json();
     if(fj.records && fj.records.length>0){
-      // atualizar o primeiro
       const recId = fj.records[0].id;
       const update = { fields: { Movimentacao: text, DataMov: dataMov, Observacao: text } };
       await fetch(`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${encodeURIComponent(CONFIG.AIRTABLE_TABLE_PROCESSOS)}/${recId}`, { method: 'PATCH', headers: headersAirtable, body: JSON.stringify(update)});
       alert('Movimentação atualizada!');
     } else {
-      // criar novo
       const create = { fields: { Processo: processo, Movimentacao: text, DataMov: dataMov, Observacao: text } };
       await fetch(`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${encodeURIComponent(CONFIG.AIRTABLE_TABLE_PROCESSOS)}`, { method: 'POST', headers: headersAirtable, body: JSON.stringify(create)});
       alert('Processo criado com movimentação!');
     }
     loadAdminList();
   } catch(err){console.error(err);alert('Erro ao salvar movimentação');}
-}
-);
+});
